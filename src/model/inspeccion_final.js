@@ -1,0 +1,40 @@
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
+
+const inspeccion_finalSchema = Schema({
+    folio: String,
+    fecha: Date,
+    producto: String,
+    lote: Number,
+    dimensiones_Finales: String,
+    limpieza: String,
+    funcion: String,
+    color_Melamina: String,
+    orientacion: String,
+    color_Cintilla: String,
+    espesor: String,
+    colocacion: String,
+    descuadre: String,
+    marcas: String,
+    despostilles: String,
+    rayaduras: String,
+    retoques: String,
+    pruebas_Resistencia: String,
+    herrajes_instalados: String,
+    etiquetas_producto: String,
+    prueba: String,
+    resane: String,
+    cubierta: String,
+    caja: String,
+    etiquetas_caja: String,
+    herrajes_bolsa: String,
+    manual_instrucciones: String,
+    color_Marmol: String,
+    ovalin: String,
+    estatus: String,
+    menor: Number,
+    mayor: Number,
+    resumen: String,
+});
+
+module.exports = mongoose.model('inspeccion_final', inspeccion_finalSchema);
