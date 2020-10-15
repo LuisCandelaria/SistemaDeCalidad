@@ -1,4 +1,7 @@
 <%- include ("./partials/_header") %>
+
+    <div class="subtitle3">
+        Reporte de Inspección en Proceso</div>
     <form action="/addInspeccionProceso" method="POST">
 
         <div class="card text-center">
@@ -56,8 +59,9 @@
             <option value="4:00 PM">4:00 PM</option>
 
         </select>
-                    </div>
 
+                    </div>
+                    <a href="/inicio/" class="btn btn-danger">Salir</a>
                 </div>
 
 
@@ -65,16 +69,17 @@
             </div>
         </div>
 
-        <a class="btn btn-primary" type="submit" style="margin-left: 10%;" onclick="this.parentNode.submit()">
-        Siguiente
+
+
+        <a class="btn btn-primary" type="submit" style="margin-left: 15%; margin-top: 2%;" onclick="this.parentNode.submit()">
+            Iniciar Reporte
         </a>
+
 
     </form>
 
 
-    <div class="flex7" style="margin-top: 10px;margin-right: 18%;">
 
-    </div>
 
 
 

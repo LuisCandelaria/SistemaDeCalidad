@@ -14,11 +14,19 @@ const defectoOperaciones = require('../model/defectoOperaciones');
 const inspeccion_de_rec = require('../model/inspeccion_de_rec');
 const piezaModelos = require('../model/piezaModelos');
 const altaPNC = require('../model/AltaPnc');
-
+const escuadradora = require('../model/escuadradora');
+const enchapadora = require('../model/enchapadora');
+const taladro = require('../model/taladro');
+const sacabocados = require('../model/sacabocados');
+const armado1 = require('../model/armado1');
+const armado2 = require('../model/armado2');
+const armado3 = require('../model/armado3');
+const acabados = require('../model/acabados');
 const inspeccion = require('../model/inspeccion_final');
-
 const bajaPNC = require('../model/BajaPnc');
+const def_proceso = require('../model/defecto_proceso');
 const inspeccionProceso = require('../model/inspeccionProceso');
+
 
 
 
@@ -28,10 +36,19 @@ const { Router } = require('express');
 
 // Nos regresaria las tareas guardadas en la BD
 router.get('/', (req, res) => {
+
     res.render('singin');
 });
 router.get('/inicio/', (req, res) => {
     res.render('Inicio');
+});
+
+router.get('/super/', (req, res) => {
+    res.render('Super');
+});
+
+router.get('/registrar/', (req, res) => {
+    res.render('registrar');
 });
 router.get('/recepcion/', async(req, res) => {;
     const prov = await provedor.find();
@@ -104,36 +121,75 @@ router.get('/inspeccionProceso/', async(req, res) => {
     res.render('InspeccionProceso', { ins });
 });
 
-router.get('/escuadradora/', (req, res) => {
-    res.render('Escuadradora');
+router.get('/escuadradora/', async(req, res) => {
+    const ins = await escuadradora.find();
+    const defOp = await defectoOperaciones.find({ operacion: "Escuadradora" });
+    const mod = await modelos.find();
+    const pieza = await piezas.find();
+
+    res.render('Escuadradora', { ins, defOp, mod, pieza });
 });
-router.get('/enchapadora/', (req, res) => {
-    res.render('Enchapadora');
+router.get('/enchapadora/', async(req, res) => {
+    const ins = await enchapadora.find();
+    const defOp = await defectoOperaciones.find({ operacion: "Enchapadora" });
+    const mod = await modelos.find();
+    const pieza = await piezas.find();
+
+    res.render('Enchapadora', { ins, defOp, mod, pieza });
 });
-router.get('/taladro/', (req, res) => {
-    res.render('Taladro');
+router.get('/taladro/', async(req, res) => {
+    const ins = await taladro.find();
+    const defOp = await defectoOperaciones.find({ operacion: "Taladro" });
+    const mod = await modelos.find();
+    const pieza = await piezas.find();
+
+    res.render('Taladro', { ins, defOp, mod, pieza });
 });
-router.get('/sacabocados/', (req, res) => {
-    res.render('Sacabocados');
+router.get('/sacabocados/', async(req, res) => {
+    const ins = await sacabocados.find();
+    const defOp = await defectoOperaciones.find({ operacion: "Sacabocados" });
+    const mod = await modelos.find();
+    const pieza = await piezas.find();
+
+    res.render('Sacabocados', { ins, defOp, mod, pieza });
 });
-router.get('/armado1/', (req, res) => {
-    res.render('Armado1');
+router.get('/armado1/', async(req, res) => {
+    const ins = await armado1.find();
+    const defOp = await defectoOperaciones.find({ operacion: "Armado1" });
+    const mod = await modelos.find();
+    const pieza = await piezas.find();
+    res.render('Armado1', { ins, defOp, mod, pieza });
 });
-router.get('/armado2/', (req, res) => {
-    res.render('Armado2');
+
+router.get('/armado2/', async(req, res) => {
+    const ins = await armado1.find();
+    const defOp = await defectoOperaciones.find({ operacion: "Armado2" });
+    const mod = await modelos.find();
+    const pieza = await piezas.find();
+    res.render('Armado2', { ins, defOp, mod, pieza });
 });
-router.get('/armado3/', (req, res) => {
-    res.render('Armado3');
+
+router.get('/armado3/', async(req, res) => {
+    const ins = await armado1.find();
+    const defOp = await defectoOperaciones.find({ operacion: "Armado3" });
+    const mod = await modelos.find();
+    const pieza = await piezas.find();
+    res.render('Armado3', { ins, defOp, mod, pieza });
 });
-router.get('/acabados/', (req, res) => {
-    res.render('Acabados');
+
+router.get('/acabados/', async(req, res) => {
+    const ins = await armado1.find();
+    const defOp = await defectoOperaciones.find({ operacion: "Acabados" });
+    const mod = await modelos.find();
+    const pieza = await piezas.find();
+    res.render('Acabados', { ins, defOp, mod, pieza });
 });
+
 router.get('/altaPNC/', async(req, res) => {
     const mod = await modelos.find();
     const def = await defectos.find();
     const oper = await operaciones.find();
     const defOp = await defectoOperaciones.find();
-
 
     res.render('AltaPNC', { mod, def, oper, defOp });
 });
@@ -150,11 +206,13 @@ router.get('/bajaPNC/', async(req, res) => {
 router.post('/registrar', function(req, res) {
     var username = req.body.username;
     var password = req.body.password;
-
+    var type = req.body.type;
     var newuser = new usuarios();
 
     newuser.username = username;
     newuser.password = password;
+    newuser.type = type;
+
 
     newuser.save(function(err, savedUser) {
         if (err) {
@@ -170,7 +228,9 @@ router.post('/registrar', function(req, res) {
 router.post('/singin', function(req, res) {
     var username = req.body.username;
     var password = req.body.password;
-    usuarios.findOne({ username: username, password: password }, function(err, user) {
+    var type = req.body.type;
+
+    usuarios.findOne({ username: username, password: password, type: type }, function(err, user) {
         if (err) {
             console.log(err);
             return res.status(500).send();
@@ -178,13 +238,23 @@ router.post('/singin', function(req, res) {
 
         if (!user) {
             return res.status(404).send("<script>  window.alert('Usuario Invalido') </script>");
-
-
         }
 
-        return res.redirect('/inicio/');
+        console.log(type)
+
+        if (type == "SuperUsuario") {
+            return res.redirect('/Super/');
+
+        } else {
+            return res.redirect('/inicio/')
+        }
     })
 });
+
+
+
+
+
 // Ruta que nos permita agregar nuevas tareas que vienen desde un metodo post
 router.post('/add', async(req, res) => {
     const task = new provedor(req.body);
@@ -234,12 +304,28 @@ router.post('/addAltaPnc', async(req, res) => {
     res.redirect('/inicio/');
 });
 
-router.post('/addInspeccionProceso/:id', async(req, res) => {
+router.post('/addInspeccionProceso', async(req, res) => {
     const defecto = new inspeccionProceso(req.body);
-    var id = req.params.id;
+    const escuad = new escuadradora(req.body);
+    const enchap = new enchapadora(req.body);
+    const tal = new taladro(req.body);
+    const sac = new sacabocados(req.body);
+    const ar1 = new armado1(req.body);
+    const ar2 = new armado2(req.body);
+    const ar3 = new armado3(req.body);
+    const aca = new acabados(req.body);
+
     await defecto.save();
-    var st = "/escuadradora/" + id;
-    res.redirect(st);
+    await escuad.save();
+    await enchap.save();
+    await tal.save();
+    await sac.save();
+    await ar1.save();
+    await ar2.save();
+    await ar3.save();
+    await aca.save();
+
+    res.redirect('/escuadradora/');
 });
 
 router.post('/addBajaPnc/:id', async(req, res) => {
@@ -255,23 +341,79 @@ router.post('/addFinal', async(req, res) => {
     res.redirect('/inicio/');
 });
 
-router.post('/addPiezaModelo', async(req, res) => {
+router.post('/addEscuadradora/:id', async(req, res) => {
+    var id = req.params.id
+    await escuadradora.update({ folio: id }, req.body);
+    res.redirect('/enchapadora/');
+});
 
+router.post('/addTaladro/:id', async(req, res) => {
+    var id = req.params.id
+    await taladro.update({ folio: id }, req.body);
+    res.redirect('/sacabocados/');
+});
+
+router.post('/addSacabocados/:id', async(req, res) => {
+    var id = req.params.id
+    await sacabocados.update({ folio: id }, req.body);
+    res.redirect('/armado1/');
+});
+
+
+router.post('/addEnchapadora/:id', async(req, res) => {
+    var id = req.params.id
+    await enchapadora.update({ folio: id }, req.body);
+    res.redirect('/taladro/');
+});
+
+router.post('/addArmado1/:id', async(req, res) => {
+    var id = req.params.id
+    await armado1.update({ folio: id }, req.body);
+    res.redirect('/armado2/');
+});
+router.post('/addArmado2/:id', async(req, res) => {
+    var id = req.params.id
+    await armado2.update({ folio: id }, req.body);
+    res.redirect('/armado3/');
+});
+
+router.post('/addArmado3/:id', async(req, res) => {
+    var id = req.params.id
+    await armado3.update({ folio: id }, req.body);
+    res.redirect('/acabados/');
+});
+
+router.post('/addAcabados/:id', async(req, res) => {
+    var id = req.params.id
+    await acabados.update({ folio: id }, req.body);
+    res.redirect('/inicio/');
+});
+
+
+router.post('/addPiezaModelo', async(req, res) => {
+    const defecto = new piezaModelos(req.body);
+    await defecto.save();
     res.redirect('/agregarPiezaModelo/');
 });
 
 router.post('/insFinal/', async(req, res) => {
-        const ins = new inspeccion(req.body);
-        await ins.save();
-        res.redirect('/inicio/');
+    const ins = new inspeccion(req.body);
+    await ins.save();
+    res.redirect('/inicio/');
 
-    })
-    // Ruta para editar los datos
+});
+router.post('/defProceso/', async(req, res) => {
+    const def_p = new def_proceso(req.body);
+    await def_p.save();
+    res.redirect('/inicio/');
+
+});
+// Ruta para editar los datos
 
 router.get('/edit/:id', async(req, res) => {
     const task = await Task.findById(req.params.id);
     res.render('Ajustes', { task });
-})
+});
 
 
 
@@ -282,7 +424,7 @@ router.post('/edit/:id', async(req, res) => {
     var id = req.params.id;
     await Task.update({ _id: id }, req.body);
     res.redirect('/');
-})
+});
 
 // Esta ruta permita modificar el estatus de una tarea por medio de su propiedad status.
 router.get('/turn/:id', async(req, res, next) => {
@@ -299,77 +441,76 @@ router.get('/delete/:id', async(req, res) => {
     var id = req.params.id;
     await provedor.remove({ _id: id });
     res.redirect('/agregarProveedor/');
-})
+});
 
 router.get('/deleteDefecto/:id', async(req, res) => {
     var id = req.params.id;
     await defectos.remove({ _id: id });
     res.redirect('/agregarDefecto/');
-})
+});
 
 router.get('/deleteMaterial/:id', async(req, res) => {
     var id = req.params.id;
     await materiales.remove({ _id: id });
     res.redirect('/agregarMaterial/');
-})
+});
 
 router.get('/deleteModelo/:id', async(req, res) => {
     var id = req.params.id;
     await modelos.remove({ _id: id });
     res.redirect('/agregarModelo/');
-})
+});
 
 router.get('/deletePieza/:id', async(req, res) => {
     var id = req.params.id;
     await piezas.remove({ _id: id });
     res.redirect('/agregarPieza/');
-})
+});
 
 router.get('/deleteDefectoOperacion/:id', async(req, res) => {
     var id = req.params.id;
     await defectoOperaciones.remove({ _id: id });
     res.redirect('/agregarDefectoOperacion/');
-})
+});
 
 router.get('/deletePiezaModelo/:id', async(req, res) => {
     var id = req.params.id;
     await piezaModelos.remove({ _id: id });
     res.redirect('/agregarPiezaModelo/');
-})
-
+});
 router.get('/deleteAltaPnc/:id', async(req, res) => {
     var id = req.params.id;
     await altaPNC.remove({ folio: id });
     res.redirect('/addBajaPnc');
-})
+});
 
 
 router.get('/enviarvariable/:id', async(req, res) => {
-        var id = req.params.id;
-        const mod = await modelos.find();
-        const def = await defectos.find();
-        const oper = await operaciones.find();
-        const acabados = await defectoOperaciones.find({ operacion: id });
-        res.render('AltaPNC copy', { acabados, mod, def, oper });
-    })
-    /*
-    router.get('/enviarvariable', async(req, res) => {
-        var id2 = req.header.
-        var id = req.params.id;
-        const mod = await modelos.find();
-        const def = await defectos.find();
-        const oper = await operaciones.find();
-        const acabados = await defectoOperaciones.find({ operacion: id });
-        res.render('AltaPNC copy', { acabados, mod, def, oper });
-    })
-    */
+    var id = req.params.id;
+    const mod = await modelos.find();
+    const def = await defectos.find();
+    const oper = await operaciones.find();
+    const acabados = await defectoOperaciones.find({ operacion: id });
+    res.render('AltaPNC copy', { acabados, mod, def, oper });
+});
+/*
+router.get('/enviarvariable', async(req, res) => {
+    var id2 = req.header.
+    var id = req.params.id;
+    const mod = await modelos.find();
+    const def = await defectos.find();
+    const oper = await operaciones.find();
+    const acabados = await defectoOperaciones.find({ operacion: id });
+    res.render('AltaPNC copy', { acabados, mod, def, oper });
+})
+*/
 router.get('/enviarFolio/:id', async(req, res) => {
     var id = req.params.id;
     const altpnc2 = await altaPNC.find({ folio: id });
     const altpnc = await altaPNC.find();
 
     res.render('BajaPNC copy', { altpnc2, altpnc });
-})
+});
 
 
 module.exports = router;
