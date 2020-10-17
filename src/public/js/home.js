@@ -32,6 +32,7 @@ function init() {
    let str = window.location.href;
    let substr = str.substr(21, str.length);
    console.log( "Estamos en la pagina de: " + substr );
+   //comentario
 }
 
 init();
